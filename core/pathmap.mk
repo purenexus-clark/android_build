@@ -37,7 +37,6 @@ pathmap_INCL := \
     libm:bionic/libm/include \
     libnativehelper:libnativehelper/include \
     libpagemap:system/extras/libpagemap/include \
-    libril:hardware/ril/include \
     libstdc++:bionic/libstdc++/include \
     mkbootimg:system/core/mkbootimg \
     opengl-tests-includes:frameworks/native/opengl/tests/include \
@@ -51,6 +50,14 @@ pathmap_INCL := \
     wilhelm-ut:frameworks/wilhelm/src/ut \
     mediandk:frameworks/av/media/ndk/ \
     speex:external/speex/include
+
+ifeq ($(TARGET_RIL_VARIANT),caf)
+pathmap_INCL += \
+    libril:hardware/ril-caf/include
+else
+pathmap_INCL += \
+    libril:hardware/ril/include
+endif
 
 #
 # Returns the path to the requested module's include directory,

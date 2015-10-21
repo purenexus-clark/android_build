@@ -41,7 +41,6 @@ SRC_HEADERS := \
 	$(TOPDIR)system/media/audio/include \
 	$(TOPDIR)hardware/libhardware/include \
 	$(TOPDIR)hardware/libhardware_legacy/include \
-	$(TOPDIR)hardware/ril/include \
 	$(TOPDIR)libnativehelper/include \
 	$(TOPDIR)frameworks/native/include \
 	$(TOPDIR)frameworks/native/opengl/include \
@@ -536,6 +535,9 @@ else
   DEFAULT_SYSTEM_DEV_CERTIFICATE := build/target/product/security/testkey
 endif
 
+# Rules for QCOM targets
+include $(BUILD_SYSTEM)/qcom_target.mk
+
 # ###############################################################
 # Set up final options.
 # ###############################################################
@@ -555,10 +557,16 @@ TARGET_RELEASE_CPPFLAGS += $(COMMON_RELEASE_CPPFLAGS)
 HOST_GLOBAL_LD_DIRS += -L$(HOST_OUT_INTERMEDIATE_LIBRARIES)
 TARGET_GLOBAL_LD_DIRS += -L$(TARGET_OUT_INTERMEDIATE_LIBRARIES)
 
+ifeq ($(TARGET_RIL_VARIANT),caf)
+TARGET_RIL_HEADERS := $(TOPDIR)hardware/ril-caf/include
+else
+TARGET_RIL_HEADERS := $(TOPDIR)hardware/ril/include
+endif
+
 HOST_PROJECT_INCLUDES:= $(SRC_HEADERS) $(SRC_HOST_HEADERS) $(HOST_OUT_HEADERS)
 TARGET_PROJECT_INCLUDES:= $(SRC_HEADERS) $(TARGET_OUT_HEADERS) \
 		$(TARGET_DEVICE_KERNEL_HEADERS) $(TARGET_BOARD_KERNEL_HEADERS) \
-		$(TARGET_PRODUCT_KERNEL_HEADERS)
+		$(TARGET_PRODUCT_KERNEL_HEADERS) $(TARGET_RIL_HEADERS)
 
 # Many host compilers don't support these flags, so we have to make
 # sure to only specify them for the target compilers checked in to
@@ -686,9 +694,6 @@ endif
 # API Level lists for Renderscript Compat lib.
 RSCOMPAT_32BIT_ONLY_API_LEVELS := 8 9 10 11 12 13 14 15 16 17 18 19 20
 RSCOMPAT_NO_USAGEIO_API_LEVELS := 8 9 10 11 12 13
-
-# Rules for QCOM targets
-include $(BUILD_SYSTEM)/qcom_target.mk
 
 ifneq ($(CUSTOM_BUILD),)
 ## We need to be sure the global selinux policies are included
